@@ -9,8 +9,8 @@ Ollama est retenu pour le rendu hackathon : il expose rapidement une API HTTP lo
 ```bash
 ollama --version
 ollama pull phi3.5
-ollama create phi3-financial-clean -f ../../ollama_server/Modelfile
-ollama run phi3-financial-clean
+ollama create phi35-financial -f ../../ollama_server/Modelfile
+ollama run phi35-financial
 ```
 
 API disponible pour DEV WEB :
@@ -30,7 +30,7 @@ Generation simple :
 ```bash
 curl http://localhost:11434/api/generate ^
   -H "Content-Type: application/json" ^
-  -d "{\"model\":\"phi3-financial-clean\",\"prompt\":\"Explique un bilan financier\",\"stream\":false}"
+  -d "{\"model\":\"phi35-financial\",\"prompt\":\"Explique un bilan financier\",\"stream\":false}"
 ```
 
 ## Decision securite

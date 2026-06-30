@@ -14,7 +14,7 @@ streamlit run app.py
 
 - Serveur Ollama : `http://localhost:11434`
 - Endpoint utilise : `http://localhost:11434/api/generate`
-- Modele : `phi3-financial-clean`
+- Modele : `phi35-financial`
 
 L'interface affiche l'etat de connexion, conserve l'historique et propose trois tests rapides :
 

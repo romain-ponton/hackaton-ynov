@@ -5,9 +5,9 @@ import requests
 import streamlit as st
 
 
-OLLAMA_BASE_URL = "http://localhost:11434"
+OLLAMA_BASE_URL = "http://185.146.193.146:11434"
 OLLAMA_GENERATE_URL = f"{OLLAMA_BASE_URL}/api/generate"
-MODEL_NAME = "phi3-financial-clean"
+MODEL_NAME = "phi35-financial"
 
 
 def check_ollama() -> tuple[bool, str]:
@@ -23,20 +23,27 @@ def check_ollama() -> tuple[bool, str]:
         return False, f"Ollama indisponible : {exc}"
 
 
-def ask_model(prompt: str) -> str:
+def stream_model(prompt: str):
     payload: dict[str, Any] = {
         "model": MODEL_NAME,
         "prompt": prompt,
-        "stream": False,
+        "stream": True,
         "options": {
             "temperature": 0.2,
             "top_p": 0.85,
             "num_predict": 512,
         },
     }
-    response = requests.post(OLLAMA_GENERATE_URL, json=payload, timeout=120)
-    response.raise_for_status()
-    return response.json().get("response", "").strip()
+    with requests.post(OLLAMA_GENERATE_URL, json=payload, stream=True, timeout=120) as response:
+        response.raise_for_status()
+        for line in response.iter_lines():
+            if line:
+                chunk = json.loads(line)
+                token = chunk.get("response", "")
+                if token:
+                    yield token
+                if chunk.get("done"):
+                    break
 
 
 st.set_page_config(page_title="TechCorp Financial Assistant", page_icon="TC")
@@ -92,9 +99,9 @@ if prompt:
 
     with st.chat_message("assistant"):
         try:
-            answer = ask_model(prompt)
+            answer = st.write_stream(stream_model(prompt))
         except Exception as exc:
             answer = f"Erreur lors de l'appel a Ollama : {exc}"
-        st.write(answer)
+            st.write(answer)
 
     st.session_state.history.append({"role": "assistant", "content": answer})
